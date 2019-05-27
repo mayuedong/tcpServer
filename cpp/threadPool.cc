@@ -1,8 +1,7 @@
 #include "threadPool.h"
 #include "thread.h"
-ThreadPool::ThreadPool(int dequeSize) 
+ThreadPool::ThreadPool() 
 : running_(false)
-, dequeSize_(dequeSize)
 , mutex_()
 , full_(mutex_)
 , empty_(mutex_){
@@ -53,7 +52,7 @@ std::function<void(void)> ThreadPool::getTask() {
   }
   std::function<void(void)>task(tasks_.front());
   tasks_.pop_front();
-  if (dequeSize_ > tasks_.size()) {
+  if (tasks_.max_size() > tasks_.size()) {
     empty_.Notify();
   }
   return task;
@@ -61,7 +60,7 @@ std::function<void(void)> ThreadPool::getTask() {
 
 void ThreadPool::Push(std::function<void(void)>func) {
   MutexLock lock(mutex_);
-  while(dequeSize_ <= tasks_.size()) {
+  while(tasks_.max_size() == tasks_.size()) {
     empty_.Wait();
   }
   tasks_.push_back(std::move(func));

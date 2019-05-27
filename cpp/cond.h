@@ -5,9 +5,6 @@
 
 class Cond {
 public:
-   Cond(const Mutex&) = delete;
-   void operator=(const Mutex&) = delete;
-
    Cond(Mutex& mutex)
    :  mutex_(mutex) {
     pthread_cond_init(&cond_, NULL);

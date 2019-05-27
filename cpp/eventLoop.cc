@@ -15,6 +15,7 @@ EventLoop::~EventLoop() {
 void EventLoop::Stop() {
   lopping_ = false;
 }
+
 void EventLoop::Update(Channel *p) {
   poller_->Update(p);
 }

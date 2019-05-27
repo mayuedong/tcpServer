@@ -5,8 +5,6 @@ class Channel;
 struct epoll_event;
 class Poller {
 public:
-  Poller(const Poller&) = delete;
-  void operator=(const Poller&) = delete;
   Poller();
   ~Poller();
   void Poll(std::vector<Channel*> *channels, int timeout);

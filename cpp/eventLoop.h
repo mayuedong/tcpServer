@@ -8,8 +8,6 @@ class Poller;
 class Channel;
 class EventLoop {
 public:
-  EventLoop(const EventLoop&) = delete;
-  void operator=(const EventLoop&) = delete;
   EventLoop();
   ~EventLoop();
   void Update(Channel *p);
@@ -17,6 +15,7 @@ public:
   void Stop();
 private:
   bool lopping_;
+  int tid_;
   std::unique_ptr<Poller>poller_;
   std::vector<Channel*>channels_;
 };

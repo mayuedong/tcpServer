@@ -9,10 +9,7 @@
 class Thread;
 class ThreadPool {
 public:
-  ThreadPool(const ThreadPool&) = delete;
-  void operator=(const ThreadPool&) = delete;
-
-  ThreadPool(int dequeSize);
+  ThreadPool();
   ~ThreadPool();
   void Start(int threadCount);
   void Stop();
@@ -21,7 +18,6 @@ private:
   void run();
   std::function<void(void)> getTask();
   bool running_;
-  size_t dequeSize_;
   Mutex mutex_;
   Cond full_;
   Cond empty_;

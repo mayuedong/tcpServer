@@ -1,22 +1,22 @@
 #include "thread.h"
-/*
+#include "infoThread.h"
 #include <sys/syscall.h>
+#include <unistd.h>
 
-void CurrentThread::cacheTid() {
-  if (0 == t_cachedTid) {
-    t_cachedTid = static_cast<pid_t>(::syscall(SYS_gettid));
-  }
+__thread int __tid = 0;
+void getTid() {
+  __tid = static_cast<pid_t>(syscall(SYS_gettid));
 }
-*/
+
 Thread::Thread(std::function<void(void)>func)
-: func_(func) {
+: func_(std::move(func)) {
 }
 
 class threadData {
 public:
   threadData(pid_t *tid, std::function<void(void)>func)
   : tid_(tid)
-  , func_(func){
+  , func_(std::move(func)){
   }
 
   pid_t *tid_;
@@ -25,7 +25,7 @@ public:
 
 void *run(void *data) {
   threadData *ptr = static_cast<threadData*>(data);
-  *(ptr->tid_) = 99;
+  *(ptr->tid_) = GetTid();
   ptr->func_();
   delete ptr;
   return NULL;

@@ -5,6 +5,7 @@
 #include "eventLoop.h"
 #include "channel.h"
 #include "thread.h"
+#include "infoThread.h"
 #include "threadPool.h"
 #include "latch.h"
 
@@ -24,7 +25,8 @@ void func1(int n) {
     sum += n;
     --n;
   }
-  printf("n:%d sum:%d\r\n", old, sum);
+  printf("n:%d sum:%d tid:%d\r\n", old, sum, GetTid());
+  sleep(1);
 }
 int main() {
 /*
@@ -44,10 +46,10 @@ int main() {
   thread.Start();
   thread.Join();
 */
-/*
-  ThreadPool pool(5);
-  pool.Start(1);
-  for (int i = 99; i < 201; i++) {
+
+  ThreadPool pool;
+  pool.Start(10);
+  for (int i = 101; i < 201; i++) {
     pool.Push(std::bind(func1, i));
   }
   Latch latch(1);
@@ -57,5 +59,5 @@ int main() {
   printf("main wait end\r\n");
   pool.Stop();
   return 0;
-*/
+
 }

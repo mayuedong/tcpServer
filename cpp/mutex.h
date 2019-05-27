@@ -5,8 +5,6 @@
 
 class Mutex {
 public:
-  Mutex(const Mutex&) = delete;
-  void operator=(const Mutex&) = delete;
   Mutex() {
     pthread_mutex_init(&mutex_, NULL);
   }

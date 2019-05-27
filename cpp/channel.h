@@ -5,8 +5,6 @@
 class EventLoop;
 class Channel {
 public:
-  Channel(const Channel&) = delete;
-  void operator=(const Channel&) = delete;
   Channel(EventLoop *loop, int fd);
   void Handle();
 
