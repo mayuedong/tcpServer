@@ -46,7 +46,7 @@ int main() {
   thread.Start();
   thread.Join();
 */
-
+/*
   ThreadPool pool;
   pool.Start(10);
   for (int i = 101; i < 201; i++) {
@@ -58,6 +58,7 @@ int main() {
   latch.Wait();
   printf("main wait end\r\n");
   pool.Stop();
+*/
   return 0;
 
 }
