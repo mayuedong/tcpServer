@@ -1,8 +1,10 @@
 #include "eventLoop.h"
-#include "channel.h"
+#include "fEvent.h"
+#include "tEvent.h"
 #include "poller.h"
 #include <sys/eventfd.h>
 #include <unistd.h>
+#include <stdlib.h>
 
 EventLoop::EventLoop()
 : loopping_(false)
@@ -10,13 +12,25 @@ EventLoop::EventLoop()
 , wake_(eventfd(0, EFD_NONBLOCK | EFD_CLOEXEC))
 , tid_(GetTid())
 , poller_(new Poller()) 
-, wakeChannel_(new Channel(this, wake_)) {
-  wakeChannel_->SetRead(std::bind(&EventLoop::handleRead, this));
-  wakeChannel_->AddReadEvent();
+, tEvent_(new Tevent(this))
+, wakeFevent_(new Fevent(this, wake_)) {
+  wakeFevent_->SetRead(std::bind(&EventLoop::handleRead, this));
+  wakeFevent_->AddReadEvent();
+}
+
+EventLoop::~EventLoop() {
+  wakeFevent_->DelAllEvent();
+  wakeFevent_->Remove();
+  close(wake_);
 }
 
 bool EventLoop::isSingleThread() {
   return GetTid() == tid_;
+}
+void EventLoop::IsInLoop() {
+  if (!isSingleThread()) {
+    abort();
+  }
 }
 
 void EventLoop::wakeup() {
@@ -29,10 +43,6 @@ void EventLoop::handleRead() {
   read(wake_, &one, sizeof one);
 }
 
-EventLoop::~EventLoop() {
-  close(wake_);
-}
-
 void EventLoop::Stop() {
   loopping_ = false;
   if (!isSingleThread()) {
@@ -40,8 +50,13 @@ void EventLoop::Stop() {
   }
 }
 
-void EventLoop::Update(Channel *p) {
+void EventLoop::Update(Fevent *p) {
+  IsInLoop();
   poller_->Update(p);
+}
+void EventLoop::Remove(Fevent *p) {
+  IsInLoop();
+  poller_->Remove(p);
 }
 
 void EventLoop::RunInLoop(std::function<void()>func) {
@@ -62,12 +77,13 @@ void EventLoop::AddTask(std::function<void()>func) {
 }
 
 void EventLoop::Loop() {
+  IsInLoop();
   loopping_ = true;
   while(loopping_) {
-    channels_.clear();
-    poller_->Poll(&channels_, 1e3);
-    for(size_t i = 0; i != channels_.size(); i++) {
-      channels_[i]->Handle();
+    fEvents_.clear();
+    poller_->Poll(&fEvents_, 1e3);
+    for(size_t i = 0; i != fEvents_.size(); i++) {
+      fEvents_[i]->Handle();
     }
     
     handing_ = true;
@@ -81,4 +97,18 @@ void EventLoop::Loop() {
     }
     handing_ = false;
   }
+}
+
+TimerEnter EventLoop::RunAt(TimeStamp when, std::function<void()>func) {
+  return tEvent_->AddTimeEvent(when, 0, std::move(func));
+}
+
+TimerEnter EventLoop::RunAfter(double delay, std::function<void()>func) {
+  TimeStamp when(AddSec(TimeStamp::Now(), delay));
+  return tEvent_->AddTimeEvent(when, 0, std::move(func));
+}
+
+TimerEnter EventLoop::RunEvery(double interval, std::function<void()>func) {
+  TimeStamp when(AddSec(TimeStamp::Now(), interval));
+  return tEvent_->AddTimeEvent(when, interval, std::move(func));
 }

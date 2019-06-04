@@ -1,11 +1,11 @@
-#ifndef _CHANNEL_H_
-#define _CHANNEL_H_
+#ifndef _F_EVENT_H_
+#define _F_EVENT_H_
 
 #include <functional>
 class EventLoop;
-class Channel {
+class Fevent {
 public:
-  Channel(EventLoop *loop, int fd);
+  Fevent(EventLoop *loop, int fd);
   void Handle();
 
   void SetFire(int v) {fire_ = v;}
@@ -19,8 +19,9 @@ public:
   void AddReadEvent();
   void DelReadEvent();
   void AddWriteEvent();
-  void delWriteEvent();
-  void delAllEvent();
+  void DelWriteEvent();
+  void DelAllEvent();
+  void Remove();
 
   int GetFd() {return fd_;}
   int GetMask() {return mask_;}
@@ -38,4 +39,4 @@ private:
   std::function<void(void)>error_;
   std::function<void(void)>close_;
 };
-#endif//_CHANNEL_H_
+#endif//_F_EVENT_H_

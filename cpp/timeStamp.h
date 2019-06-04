@@ -21,6 +21,18 @@ inline bool operator<(TimeStamp lhs, TimeStamp rhs) {
   return lhs.GetUs() < rhs.GetUs();
 }
 
+inline bool operator<=(TimeStamp lhs, TimeStamp rhs) {
+  return lhs.GetUs() <= rhs.GetUs();
+}
+
+inline bool operator>(TimeStamp lhs, TimeStamp rhs) {
+  return lhs.GetUs() > rhs.GetUs();
+}
+
+inline bool operator>=(TimeStamp lhs, TimeStamp rhs) {
+  return lhs.GetUs() >= rhs.GetUs();
+}
+
 inline bool operator==(TimeStamp lhs, TimeStamp rhs) {
   return lhs.GetUs() == rhs.GetUs();
 }

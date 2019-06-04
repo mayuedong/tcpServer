@@ -1,9 +1,9 @@
-#include "channel.h"
+#include "fEvent.h"
 #include "eventLoop.h"
 #include "poller.h"
 #include <poll.h>
 #include "eventLoop.h"
-Channel::Channel(EventLoop *loop, int fd) 
+Fevent::Fevent(EventLoop *loop, int fd) 
 : fd_(fd)
 , mask_(0)
 , fire_(0)
@@ -11,28 +11,31 @@ Channel::Channel(EventLoop *loop, int fd)
 , loop_(loop){
 }
 
-void Channel::AddReadEvent() {
+void Fevent::AddReadEvent() {
   mask_ |= POLLIN | POLLPRI;
   loop_->Update(this);
 }
-  void Channel::DelReadEvent() {
+  void Fevent::DelReadEvent() {
   mask_ &= ~(POLLIN | POLLPRI);
   loop_->Update(this);
 }
-  void Channel::AddWriteEvent() {
+  void Fevent::AddWriteEvent() {
   mask_ |= POLLOUT;
   loop_->Update(this);
 }
-  void Channel::delWriteEvent() {
+  void Fevent::DelWriteEvent() {
   mask_ &= ~POLLOUT;
   loop_->Update(this);
 }
-  void Channel::delAllEvent() {
+  void Fevent::DelAllEvent() {
   mask_ = 0;
   loop_->Update(this);
 }
+  void Fevent::Remove() {
+  loop_->Remove(this);
+}
 
-void Channel::Handle() {
+void Fevent::Handle() {
   if ((fire_ & POLLHUP) && !(fire_ & POLLIN)) {
     if (close_) {
       close_();

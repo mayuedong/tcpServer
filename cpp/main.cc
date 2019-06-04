@@ -3,7 +3,7 @@
 #include <cstring>
 #include <sys/timerfd.h>
 #include "eventLoop.h"
-#include "channel.h"
+#include "fEvent.h"
 #include "thread.h"
 #include "infoThread.h"
 #include "threadPool.h"
@@ -36,7 +36,7 @@ int main() {
   how.it_value.tv_sec = 2;
   timerfd_settime(fd,0,&how,NULL);
 
-  Channel ch(&loop, fd);
+  Fevent ch(&loop, fd);
   ch.SetRead(func);
   ch.AddReadEvent();
   loop.Loop();
