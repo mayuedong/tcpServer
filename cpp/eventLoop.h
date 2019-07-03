@@ -25,8 +25,9 @@ public:
   TimerEnter RunAt(TimeStamp when, std::function<void()>func);
   TimerEnter RunAfter(double delay, std::function<void()>func);
   TimerEnter RunEvery(double interval, std::function<void()>func);
+  void CancelTimeEvent(TimerEnter enter);
 private:
-bool isSingleThread();
+  bool isSingleThread();
   void wakeup();
   void handleRead();
   bool loopping_;

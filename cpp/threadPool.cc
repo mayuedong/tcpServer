@@ -1,7 +1,8 @@
 #include "threadPool.h"
 #include "thread.h"
-ThreadPool::ThreadPool() 
+ThreadPool::ThreadPool(int numThread) 
 : running_(false)
+, numThread_(numThread)
 , mutex_()
 , full_(mutex_)
 , empty_(mutex_){
@@ -24,10 +25,10 @@ void ThreadPool::Stop() {
   }
 }
 
-void ThreadPool::Start(int threadCount) {
+void ThreadPool::Start() {
   running_ = true;
-  threads_.reserve(threadCount);
-  for (int i = 0; i < threadCount; i++) {
+  threads_.reserve(numThread_);
+  for (int i = 0; i < numThread_; i++) {
     threads_.emplace_back(new Thread(std::bind(&ThreadPool::run, this)));
     threads_[i]->Start();
   }

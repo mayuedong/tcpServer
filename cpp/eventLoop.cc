@@ -27,6 +27,7 @@ EventLoop::~EventLoop() {
 bool EventLoop::isSingleThread() {
   return GetTid() == tid_;
 }
+
 void EventLoop::IsInLoop() {
   if (!isSingleThread()) {
     abort();
@@ -111,4 +112,8 @@ TimerEnter EventLoop::RunAfter(double delay, std::function<void()>func) {
 TimerEnter EventLoop::RunEvery(double interval, std::function<void()>func) {
   TimeStamp when(AddSec(TimeStamp::Now(), interval));
   return tEvent_->AddTimeEvent(when, interval, std::move(func));
+}
+
+void EventLoop::CancelTimeEvent(TimerEnter enter) {
+  tEvent_->CancelEvent(enter);
 }

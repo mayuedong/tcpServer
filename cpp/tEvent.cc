@@ -104,6 +104,7 @@ void Tevent::reset(std::vector<std::pair<TimeStamp, Timer*>> &expEvent) {
     std::pair<Timer*, int64_t>sentry(it->second, it->second->GetId());
     if (it->second->Repeat() && cancelEvents_.end() == cancelEvents_.find(sentry)) {
       it->second->Reset(TimeStamp::Now());
+      insert(it->second);
     }else {
       delete it->second;
     }

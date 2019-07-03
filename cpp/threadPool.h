@@ -9,15 +9,16 @@
 class Thread;
 class ThreadPool {
 public:
-  ThreadPool();
+  ThreadPool(int numThread);
   ~ThreadPool();
-  void Start(int threadCount);
+  void Start();
   void Stop();
   void Push(std::function<void(void)>func);
 private:
   void run();
   std::function<void(void)> getTask();
   bool running_;
+  int numThread_;
   Mutex mutex_;
   Cond full_;
   Cond empty_;
